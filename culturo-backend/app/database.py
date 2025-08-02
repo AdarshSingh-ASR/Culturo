@@ -3,14 +3,26 @@ Database configuration and session management with Prisma
 """
 from prisma import Prisma
 import redis
-from typing import Generator
+from typing import Generator, Optional
 from .config import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Create Prisma client
 prisma = Prisma()
 
-# Redis client
-redis_client = redis.from_url(settings.redis_url, decode_responses=True)
+# Redis client - make it optional
+redis_client: Optional[redis.Redis] = None
+
+try:
+    redis_client = redis.from_url(settings.redis_url, decode_responses=True)
+    # Test connection
+    redis_client.ping()
+    logger.info("Redis connection established successfully")
+except Exception as e:
+    logger.warning(f"Redis connection failed: {e}. Redis features will be disabled.")
+    redis_client = None
 
 
 def get_db() -> Generator[Prisma, None, None]:
@@ -22,7 +34,7 @@ def get_db() -> Generator[Prisma, None, None]:
         prisma.disconnect()
 
 
-def get_redis() -> redis.Redis:
+def get_redis() -> Optional[redis.Redis]:
     """Dependency to get Redis client"""
     return redis_client
 
@@ -32,9 +44,9 @@ def init_db():
     try:
         prisma.connect()
         # Prisma will handle table creation automatically
-        print("Database initialized successfully with Prisma")
+        logger.info("Database initialized successfully with Prisma")
     except Exception as e:
-        print(f"Database initialization failed: {e}")
+        logger.error(f"Database initialization failed: {e}")
     finally:
         prisma.disconnect()
 
@@ -48,15 +60,17 @@ def check_db_connection():
         prisma.disconnect()
         return True
     except Exception as e:
-        print(f"Database connection failed: {e}")
+        logger.error(f"Database connection failed: {e}")
         return False
 
 
 def check_redis_connection():
     """Check Redis connection"""
+    if redis_client is None:
+        return False
     try:
         redis_client.ping()
         return True
     except Exception as e:
-        print(f"Redis connection failed: {e}")
+        logger.error(f"Redis connection failed: {e}")
         return False 

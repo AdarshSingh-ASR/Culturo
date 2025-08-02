@@ -9,9 +9,12 @@ from typing import Optional
 import redis
 import requests
 import json
+import logging
 
 from .database import get_db, get_redis
 from .config import settings
+
+logger = logging.getLogger(__name__)
 
 # Security scheme
 security = HTTPBearer()
@@ -204,29 +207,39 @@ def get_current_clerk_user(
         )
 
 
-def get_redis_client() -> redis.Redis:
+def get_redis_client() -> Optional[redis.Redis]:
     """Get Redis client dependency"""
     return get_redis()
 
 
 def rate_limit_check(
     user_id: Optional[str] = None,
-    redis_client: redis.Redis = Depends(get_redis_client)
+    redis_client: Optional[redis.Redis] = Depends(get_redis_client)
 ) -> bool:
     """Check rate limiting for API endpoints"""
     if not user_id:
         return True
     
-    key = f"rate_limit:{user_id}"
-    current_count = redis_client.get(key)
-    
-    if current_count is None:
-        redis_client.setex(key, 60, 1)  # 1 minute TTL
+    # If Redis is not available, skip rate limiting
+    if redis_client is None:
+        logger.warning("Redis not available, skipping rate limiting")
         return True
     
-    count = int(current_count)
-    if count >= settings.rate_limit_per_minute:
-        return False
-    
-    redis_client.incr(key)
-    return True 
+    try:
+        key = f"rate_limit:{user_id}"
+        current_count = redis_client.get(key)
+        
+        if current_count is None:
+            redis_client.setex(key, 60, 1)  # 1 minute TTL
+            return True
+        
+        count = int(current_count)
+        if count >= settings.rate_limit_per_minute:
+            return False
+        
+        redis_client.incr(key)
+        return True
+    except Exception as e:
+        logger.error(f"Rate limiting error: {e}")
+        # If Redis fails, allow the request
+        return True 

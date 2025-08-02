@@ -9,6 +9,10 @@ echo "Starting Culturo Backend..."
 echo "Generating Prisma client..."
 prisma generate
 
+# Fetch Prisma query engine
+echo "Fetching Prisma query engine..."
+prisma py fetch
+
 # Push database schema
 echo "Pushing database schema..."
 prisma db push

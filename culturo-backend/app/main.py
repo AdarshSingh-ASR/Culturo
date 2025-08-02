@@ -152,7 +152,8 @@ async def health_check():
     db_status = check_db_connection()
     redis_status = check_redis_connection()
     
-    status = "healthy" if db_status and redis_status else "unhealthy"
+    # Consider service healthy if database is connected, Redis is optional
+    status = "healthy" if db_status else "unhealthy"
     
     return {
         "status": status,
@@ -264,7 +265,9 @@ async def startup_event():
     if not db_status:
         logger.error("Database connection failed")
     if not redis_status:
-        logger.error("Redis connection failed")
+        logger.warning("Redis connection failed - Redis features will be disabled")
+    else:
+        logger.info("Redis connection established")
     
     logger.info("Application startup completed")
 
