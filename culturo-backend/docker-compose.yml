@@ -1,0 +1,146 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: culturo_postgres
+    environment:
+      POSTGRES_DB: culturo_db
+      POSTGRES_USER: culturo_user
+      POSTGRES_PASSWORD: culturo_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - culturo_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U culturo_user -d culturo_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: culturo_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - culturo_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Culturo Backend API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: culturo_api
+    environment:
+      - DATABASE_URL=postgresql://culturo_user:culturo_password@postgres:5432/culturo_db
+      - REDIS_URL=redis://redis:6379/0
+      - QLOO_API_KEY=${QLOO_API_KEY}
+      - QLOO_API_URL=${QLOO_API_URL}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - SECRET_KEY=${SECRET_KEY}
+      - ALGORITHM=${ALGORITHM}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
+      - GOOGLE_PLACES_API_KEY=${GOOGLE_PLACES_API_KEY}
+      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      - PROMETHEUS_ENABLED=${PROMETHEUS_ENABLED}
+      - CACHE_TTL=${CACHE_TTL}
+      - RATE_LIMIT_PER_MINUTE=${RATE_LIMIT_PER_MINUTE}
+      - MAX_FILE_SIZE=${MAX_FILE_SIZE}
+      - ALLOWED_IMAGE_TYPES=${ALLOWED_IMAGE_TYPES}
+      - DEBUG=false
+      - ENVIRONMENT=production
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - culturo_network
+    volumes:
+      - ./app/ml/models:/app/app/ml/models
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: culturo_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - api
+    networks:
+      - culturo_network
+    profiles:
+      - production
+
+  # Prometheus Monitoring (Optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: culturo_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - culturo_network
+    profiles:
+      - monitoring
+
+  # Grafana Dashboard (Optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: culturo_grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    networks:
+      - culturo_network
+    profiles:
+      - monitoring
+
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  culturo_network:
+    driver: bridge 

@@ -1,0 +1,29 @@
+{
+  "name": "culturo",
+  "version": "1.0.0",
+  "description": "Cultural Intelligence Platform - Unified deployment for Railway",
+  "main": "main.py",
+  "scripts": {
+    "start": "python main.py",
+    "build": "cd culturo-frontend && npm install && npm run build",
+    "dev": "python main.py"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/culturo.git"
+  },
+  "keywords": [
+    "cultural-intelligence",
+    "ai",
+    "recommendations",
+    "travel-planning",
+    "story-development",
+    "food-analysis"
+  ],
+  "author": "Culturo Team",
+  "license": "MIT"
+} 
