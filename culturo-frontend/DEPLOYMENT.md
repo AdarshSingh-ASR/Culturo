@@ -29,14 +29,14 @@ VITE_ENVIRONMENT=production
 
 ### Option A: Using Vercel CLI
 1. Install Vercel CLI: `npm i -g vercel`
-2. Navigate to the frontend directory: `cd culturo-frontend`
+2. Navigate to the root directory: `cd /path/to/culturo`
 3. Run: `vercel --prod`
 
 ### Option B: Using Vercel Dashboard
 1. Go to [vercel.com](https://vercel.com)
 2. Click "New Project"
 3. Import your GitHub repository
-4. Set the root directory to `culturo-frontend`
+4. **Important**: Keep the root directory as the project root (don't change it)
 5. Configure environment variables in the Vercel dashboard:
    - `VITE_API_URL`: Your Render backend URL
    - `VITE_CLERK_PUBLISHABLE_KEY`: Your Clerk publishable key
@@ -63,6 +63,7 @@ CORS_ORIGINS=["https://your-app-name.vercel.app"]
 ```
 
 ## Notes
-- The `vercel.json` file is already configured for optimal deployment
-- Vercel will automatically build your project using the `npm run build` command
+- The root `vercel.json` file is configured for optimal deployment
+- Vercel will automatically build your project using the root `npm run build` command
+- The build process will navigate to `culturo-frontend` and build the Vite app
 - Your app will be available at `https://your-app-name.vercel.app` 

@@ -1,6 +1,6 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",
+  "outputDirectory": "culturo-frontend/dist",
   "framework": "vite",
   "rewrites": [
     {

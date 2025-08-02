@@ -64,8 +64,8 @@
 - [ ] Go to Vercel dashboard
 - [ ] Click "New Project"
 - [ ] Import your repository
-- [ ] Set root directory to `culturo-frontend`
-- [ ] Vercel will auto-detect `vercel.json`
+- [ ] **Important**: Keep root directory as project root (don't change it)
+- [ ] Vercel will auto-detect root `vercel.json`
 
 ### 3. Configure Environment Variables
 - [ ] Set `VITE_API_URL` to your Render backend URL
