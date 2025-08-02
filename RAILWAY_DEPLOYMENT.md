@@ -231,9 +231,20 @@ If you encounter "Image size exceeded limit" errors (Railway free tier has a 4GB
 
 1. **Multi-stage Dockerfile**: Reduces image size by using Alpine Linux and multi-stage builds
 2. **Lightweight Dockerfile**: Backend-only deployment with minimal dependencies
-3. **Frontend Separation**: Deploy frontend separately on Vercel/Netlify for even smaller backend image
+3. **Ultra-lightweight Dockerfile**: PyTorch-free deployment for smallest possible image size
+4. **Frontend Separation**: Deploy frontend separately on Vercel/Netlify for even smaller backend image
 
-**To use the lightweight backend-only deployment:**
+**To use the ultra-lightweight backend-only deployment (recommended):**
+```json
+{
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile.ultra-lightweight"
+  }
+}
+```
+
+**To use the lightweight backend-only deployment (includes PyTorch):**
 ```json
 {
   "build": {
@@ -257,11 +268,20 @@ If you encounter "Image size exceeded limit" errors (Railway free tier has a 4GB
 #### 1.1. Image Size Exceeded
 **Problem**: "Image of size X GB exceeded limit of 4.0 GB"
 **Solution**:
-- Use the lightweight Dockerfile: `Dockerfile.lightweight`
+- Use the ultra-lightweight Dockerfile: `Dockerfile.ultra-lightweight` (PyTorch-free)
+- Use the lightweight Dockerfile: `Dockerfile.lightweight` (includes PyTorch)
 - Deploy frontend separately on Vercel/Netlify
 - Remove unnecessary files from `.dockerignore`
 - Use Alpine Linux base images
 - Implement multi-stage builds
+
+#### 1.2. PyTorch Installation Issues
+**Problem**: "ERROR: Could not find a version that satisfies the requirement torch"
+**Solution**:
+- PyTorch is not compatible with Alpine Linux (musl libc)
+- Use `Dockerfile.ultra-lightweight` which excludes PyTorch
+- Or use `Dockerfile.lightweight` which uses Debian-based image
+- Consider deploying ML features separately if needed
 
 #### 2. Environment Variables
 **Problem**: App can't find API keys or database

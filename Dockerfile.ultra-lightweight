@@ -1,4 +1,4 @@
-# Ultra-lightweight backend-only Dockerfile (PyTorch compatible)
+# Ultra-lightweight backend-only Dockerfile (PyTorch-free)
 FROM python:3.11-slim
 
 # Set working directory
@@ -7,13 +7,12 @@ WORKDIR /app
 # Install minimal system dependencies
 RUN apt-get update && apt-get install -y \
     curl \
-    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy Python requirements
-COPY culturo-backend/requirements.txt ./
+# Copy lightweight Python requirements
+COPY culturo-backend/requirements-lightweight.txt ./requirements.txt
 
-# Install Python dependencies (only production ones)
+# Install Python dependencies (lightweight version)
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
