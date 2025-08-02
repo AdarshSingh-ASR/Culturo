@@ -3,7 +3,7 @@ services:
     name: culturo-backend
     env: python
     plan: starter
-    dockerfilePath: null
+    rootDir: culturo-backend
     buildCommand: |
       pip install -r requirements-render.txt
       prisma generate
