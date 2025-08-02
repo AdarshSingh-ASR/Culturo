@@ -5,7 +5,7 @@
   "main": "main.py",
   "scripts": {
     "start": "python main.py",
-    "build": "cd culturo-frontend && npm install && npm run build",
+    "build": "cd culturo-frontend && npm install && npm run build && cp -r dist ../dist",
     "dev": "python main.py"
   },
   "engines": {
