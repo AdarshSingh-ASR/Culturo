@@ -3,13 +3,21 @@
 # Build script for Culturo Backend
 # This script handles the build phase with proper Prisma setup
 
-set -e
+set -e  # Exit on any error
+set -x  # Print commands as they are executed
 
 echo "🚀 Starting Culturo Backend build..."
+echo "📁 Current directory: $(pwd)"
+echo "🐍 Python version: $(python --version)"
+echo "📦 pip version: $(pip --version)"
 
 # Install dependencies
 echo "📦 Installing Python dependencies..."
 pip install -r requirements.txt
+
+# Verify Prisma is installed
+echo "🔍 Verifying Prisma installation..."
+python -c "import prisma; print('✅ Prisma package found')"
 
 # Generate Prisma client
 echo "🔧 Generating Prisma client..."
