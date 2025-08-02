@@ -47,8 +47,18 @@ def build_frontend():
 
 def create_unified_app():
     """Create the unified FastAPI application"""
-    # Import the original FastAPI app
-    from culturo_backend.app.main import app as backend_app
+    try:
+        # Try to import the original FastAPI app
+        from culturo_backend.app.main import app as backend_app
+    except ImportError:
+        # Fallback: try direct import
+        try:
+            sys.path.insert(0, str(Path(__file__).parent))
+            from culturo_backend.app.main import app as backend_app
+        except ImportError:
+            # Last resort: try relative import
+            sys.path.insert(0, str(Path(__file__).parent / "culturo-backend"))
+            from app.main import app as backend_app
     
     # Create a new FastAPI app for the unified server
     app = FastAPI(

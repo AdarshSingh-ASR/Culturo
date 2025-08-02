@@ -229,12 +229,13 @@ If you encounter Nixpacks build failures (like the "undefined variable 'npm'" er
 
 If you encounter "Image size exceeded limit" errors (Railway free tier has a 4GB limit), the project includes optimized Dockerfiles:
 
-1. **Multi-stage Dockerfile**: Reduces image size by using Alpine Linux and multi-stage builds
-2. **Lightweight Dockerfile**: Backend-only deployment with minimal dependencies
-3. **Ultra-lightweight Dockerfile**: PyTorch-free deployment for smallest possible image size
-4. **Frontend Separation**: Deploy frontend separately on Vercel/Netlify for even smaller backend image
+1. **Full-stack Dockerfile**: Complete deployment with React frontend and FastAPI backend
+2. **Multi-stage Dockerfile**: Reduces image size by using Alpine Linux and multi-stage builds
+3. **Lightweight Dockerfile**: Backend-only deployment with minimal dependencies
+4. **Ultra-lightweight Dockerfile**: PyTorch-free backend-only deployment
+5. **Frontend Separation**: Deploy frontend separately on Vercel/Netlify for even smaller backend image
 
-**To use the ultra-lightweight backend-only deployment (recommended):**
+**To use the full-stack deployment (recommended - includes your React frontend):**
 ```json
 {
   "build": {
@@ -268,9 +269,9 @@ If you encounter "Image size exceeded limit" errors (Railway free tier has a 4GB
 #### 1.1. Image Size Exceeded
 **Problem**: "Image of size X GB exceeded limit of 4.0 GB"
 **Solution**:
-- Use the ultra-lightweight Dockerfile: `Dockerfile.ultra-lightweight` (PyTorch-free)
-- Use the lightweight Dockerfile: `Dockerfile.lightweight` (includes PyTorch)
-- Deploy frontend separately on Vercel/Netlify
+- Use the full-stack Dockerfile: `Dockerfile.ultra-lightweight` (includes React frontend)
+- Use the lightweight Dockerfile: `Dockerfile.lightweight` (backend only with PyTorch)
+- Deploy frontend separately on Vercel/Netlify for smaller backend image
 - Remove unnecessary files from `.dockerignore`
 - Use Alpine Linux base images
 - Implement multi-stage builds

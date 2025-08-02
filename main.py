@@ -118,11 +118,17 @@ def main():
 def run_unified_server():
     """Run a unified server that serves both backend API and frontend"""
     try:
-        # Import and run the unified server
-        from unified_server import main as unified_main
+        # Import and run the simplified unified server
+        from unified_server_simple import main as unified_main
         unified_main()
     except Exception as e:
         logger.error(f"Unified server startup failed: {e}")
+        # Fallback: try the original unified server
+        try:
+            from unified_server import main as unified_main
+            unified_main()
+        except Exception as e2:
+            logger.error(f"Fallback unified server also failed: {e2}")
         sys.exit(1)
 
 def run_development_servers():
