@@ -118,18 +118,43 @@ def main():
 def run_unified_server():
     """Run a unified server that serves both backend API and frontend"""
     try:
-        # Import and run the simplified unified server
-        from unified_server_simple import main as unified_main
-        unified_main()
+        # Try the simple server first (most reliable)
+        logger.info("Trying simple server...")
+        from simple_server import main as simple_main
+        simple_main()
     except Exception as e:
-        logger.error(f"Unified server startup failed: {e}")
-        # Fallback: try the original unified server
+        logger.error(f"Simple server failed: {e}")
+        # Fallback: try the simplified unified server
         try:
-            from unified_server import main as unified_main
+            logger.info("Trying simplified unified server...")
+            from unified_server_simple import main as unified_main
             unified_main()
         except Exception as e2:
-            logger.error(f"Fallback unified server also failed: {e2}")
-        sys.exit(1)
+            logger.error(f"Simplified unified server failed: {e2}")
+            # Last resort: try direct backend import
+            try:
+                logger.info("Trying direct backend import...")
+                import sys
+                from pathlib import Path
+                
+                # Add backend to path
+                backend_path = Path(__file__).parent / "culturo-backend"
+                sys.path.insert(0, str(backend_path))
+                
+                # Import and run backend directly
+                from app.main import app
+                import uvicorn
+                
+                logger.info("Starting backend directly...")
+                uvicorn.run(
+                    app,
+                    host="0.0.0.0",
+                    port=int(os.environ.get("PORT", 8000)),
+                    log_level="info"
+                )
+            except Exception as e3:
+                logger.error(f"Direct backend import also failed: {e3}")
+                sys.exit(1)
 
 def run_development_servers():
     """Run both backend and frontend in development mode"""

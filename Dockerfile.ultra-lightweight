@@ -45,6 +45,7 @@ COPY culturo-backend/ ./culturo-backend/
 
 # Copy main application files
 COPY main.py ./
+COPY simple_server.py ./
 COPY unified_server.py ./
 COPY unified_server_simple.py ./
 COPY test_import.py ./

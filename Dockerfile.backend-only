@@ -1,0 +1,42 @@
+# Minimal Backend-Only Dockerfile
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install minimal system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy lightweight Python requirements
+COPY culturo-backend/requirements-lightweight.txt ./requirements.txt
+
+# Install Python dependencies
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copy backend source
+COPY culturo-backend/ ./culturo-backend/
+
+# Copy simple server
+COPY simple_server.py ./
+
+# Test that imports work correctly
+RUN cd culturo-backend && python -c "from app.main import app; print('✅ Backend import successful')"
+
+# Create non-root user
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+USER appuser
+
+# Expose port
+EXPOSE 8000
+
+# Set environment variables
+ENV PYTHONPATH=/app/culturo-backend
+ENV HOST=0.0.0.0
+ENV PORT=8000
+ENV ENVIRONMENT=production
+
+# Start the simple server
+CMD ["python", "simple_server.py"]
