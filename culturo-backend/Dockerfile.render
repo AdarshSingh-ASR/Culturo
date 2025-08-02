@@ -1,4 +1,4 @@
-# Use Python 3.11 slim image
+# Use Python 3.11 slim image for Render
 FROM python:3.11-slim
 
 # Set environment variables
@@ -9,13 +9,12 @@ ENV PYTHONPATH=/app
 # Set work directory
 WORKDIR /app
 
-# Install system dependencies
+# Install minimal system dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         build-essential \
         curl \
         libpq-dev \
-        wget \
         git \
     && rm -rf /var/lib/apt/lists/*
 
@@ -29,11 +28,6 @@ COPY . .
 
 # Create necessary directories
 RUN mkdir -p /app/app/ml/models
-
-# Create non-root user
-RUN adduser --disabled-password --gecos '' appuser \
-    && chown -R appuser:appuser /app
-USER appuser
 
 # Expose port
 EXPOSE 8000

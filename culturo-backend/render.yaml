@@ -4,7 +4,7 @@ services:
     env: python
     plan: starter
     buildCommand: |
-      pip install -r requirements.txt
+      pip install -r requirements-render.txt
       prisma generate
     startCommand: |
       prisma db push
