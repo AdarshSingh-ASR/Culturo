@@ -22,6 +22,11 @@ COPY culturo-backend/ ./culturo-backend/
 # Copy simple server
 COPY simple_server.py ./
 
+# Generate Prisma client
+RUN cd culturo-backend && \
+    DATABASE_URL="postgresql://dummy:dummy@localhost/dummy" \
+    prisma generate
+
 # Test that imports work correctly with dummy environment variables
 RUN cd culturo-backend && \
     DATABASE_URL="postgresql://dummy:dummy@localhost/dummy" \
