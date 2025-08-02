@@ -49,7 +49,7 @@ class FoodAnalysisService:
             "lebanese": ["shawarma", "falafel", "tabbouleh", "hummus", "baklava"]
         }
     
-    async def analyze_food_by_name(self, food_name: str, user_id: Optional[int] = None) -> Dict[str, Any]:
+    async def analyze_food_by_name(self, food_name: str, user_id: Optional[str] = None) -> Dict[str, Any]:
         """Analyze food based on name input using Qloo and LLM"""
         try:
             # Normalize food name

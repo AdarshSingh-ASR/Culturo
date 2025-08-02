@@ -28,7 +28,7 @@ class StoriesService:
         self.llm_service = LLMService()
         self.qloo_service = QlooService()
 
-    async def generate_story(self, request: StoryGenerationRequest, user_id: Optional[int] = None) -> StoryGenerationResponse:
+    async def generate_story(self, request: StoryGenerationRequest, user_id: Optional[str] = None) -> StoryGenerationResponse:
         """Generate AI-powered story with cultural insights"""
         try:
             # Get cultural context from Qloo
@@ -123,7 +123,7 @@ Estimated Word Count: {story_data["estimated_word_count"]}
                             "content": story_content,
                             "genre": request.genre,
                             "target_audience": request.target_audience,
-                            "cultural_context": {
+                            "cultural_context": json.dumps({
                                 "original_prompt": request.story_prompt,
                                 "tone": request.tone,
                                 "length": request.length,
@@ -134,13 +134,9 @@ Estimated Word Count: {story_data["estimated_word_count"]}
                                 "audience_analysis": story_data["audience_analysis"],
                                 "writing_style": story_data["writing_style"],
                                 "estimated_word_count": story_data["estimated_word_count"]
-                            },
+                            }),
                             "ai_generated": True,
-                            "user": {
-                                "connect": {
-                                    "id": str(user_id)  # Convert to string for Prisma
-                                }
-                            }
+                            "user_id": str(user_id)  # Use user_id directly instead of user relation
                         }
                     )
                 except Exception as db_error:
@@ -275,7 +271,7 @@ Estimated Word Count: {story_data["estimated_word_count"]}
                 detail=f"Feedback creation failed: {str(e)}"
             )
 
-    def get_user_stories(self, user_id: int, limit: int = 10) -> List[Any]:
+    def get_user_stories(self, user_id: str, limit: int = 10) -> List[Any]:
         """Get user's stories"""
         return self.db.story.find_many(
             where={"user_id": user_id},
@@ -804,21 +800,15 @@ async def generate_story(
             db.analytics.create(
                 data={
                     "event_type": "feature_use",
-                    "event_name": "story_generation",
-                    "event_data": {"genre": request.genre, "target_audience": request.target_audience},
-                    "user": {
-                        "connect": {
-                            "id": str(current_user.id)  # Convert to string for Prisma
-                        }
-                    },
-                    "created_at": datetime.utcnow()
+                    "event_data": json.dumps({"genre": request.genre, "target_audience": request.target_audience}),
+                    "user_id": str(current_user.id)  # Use user_id directly
                 }
             )
         except Exception as analytics_error:
             logger.error(f"Failed to track analytics: {analytics_error}")
             # Continue without analytics tracking
     
-    return await stories_service.generate_story(request, current_user.id if current_user else None)
+    return await stories_service.generate_story(request, str(current_user.id) if current_user else None)
 
 @router.post("/analyze", response_model=StoryAnalysisResponse)
 async def analyze_story(
@@ -858,7 +848,7 @@ def get_user_stories(
 ):
     """Get user's stories"""
     stories_service = StoriesService(db)
-    return stories_service.get_user_stories(current_user.id, limit)
+    return stories_service.get_user_stories(str(current_user.id), limit)
 
 @router.post("/surprise")
 async def get_random_story(

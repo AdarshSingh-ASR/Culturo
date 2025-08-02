@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from datetime import datetime
 from typing import List, Optional
 import logging
+import json
 
 from ..database import get_db
 from ..schemas.food import (
@@ -24,7 +25,7 @@ class FoodService:
         self.qloo_service = QlooService()
         self.food_analysis_service = FoodAnalysisService(self.llm_service, self.qloo_service)
 
-    async def analyze_food_by_name(self, food_name: str, user_id: Optional[int] = None) -> FoodAnalysisResponse:
+    async def analyze_food_by_name(self, food_name: str, user_id: Optional[str] = None) -> FoodAnalysisResponse:
         """Analyze food by name using LLM and Qloo services"""
         try:
             # Analyze food using the new service
@@ -190,14 +191,12 @@ async def analyze_food(
         db.analytics.create(
             data={
                 "event_type": "feature_use",
-                "event_name": "food_analysis",
-                "event_data": {"food_name": request.food_name},
-                "user_id": current_user.id,
-                "timestamp": datetime.utcnow()
+                "event_data": json.dumps({"food_name": request.food_name}),
+                "user_id": str(current_user.id)  # Convert to string
             }
         )
     
-    return await food_service.analyze_food_by_name(request.food_name, current_user.id if current_user else None)
+    return await food_service.analyze_food_by_name(request.food_name, str(current_user.id) if current_user else None)
 
 @router.post("/recommendations", response_model=FoodRecommendationResponse)
 async def get_food_recommendations(

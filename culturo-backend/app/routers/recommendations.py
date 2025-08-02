@@ -1061,7 +1061,7 @@ async def get_personalized_recommendations(
             db.analytics.create(
                 data={
                     "event_type": "recommendations",
-                    "event_data": {"category": request.category, "item_count": request.limit},
+                    "event_data": json.dumps({"category": request.category, "item_count": request.limit}),
                     "user_id": str(current_user.id),  # Convert to string for Prisma
                     "session_id": f"session_{current_user.id}_{datetime.utcnow().strftime('%Y%m%d')}"
                 }

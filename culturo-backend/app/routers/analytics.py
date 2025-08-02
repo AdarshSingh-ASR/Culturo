@@ -23,7 +23,7 @@ class AnalyticsService:
         self.llm_service = LLMService()
         self.qloo_service = QlooService()
 
-    async def get_user_analytics(self, user_id: int) -> UserAnalyticsResponse:
+    async def get_user_analytics(self, user_id: str) -> UserAnalyticsResponse:
         """Get comprehensive user analytics"""
         try:
             # Get user data
@@ -63,7 +63,7 @@ class AnalyticsService:
             cultural_profile = self._generate_cultural_profile(user, events, cultural_insights)
             
             return UserAnalyticsResponse(
-                user_id=user_id,
+                user_id=str(user_id),
                 user_profile={
                     "total_sessions": total_sessions,
                     "total_requests": total_requests,
@@ -156,7 +156,7 @@ class AnalyticsService:
         top_interests = preferences[:5] if preferences else ["Cultural Exploration", "Learning", "Discovery"]
         
         return UserAnalyticsResponse(
-            user_id=user.id,
+            user_id=str(user.id),
             user_profile={
                 "total_sessions": base_sessions,
                 "total_requests": base_requests,
@@ -327,7 +327,7 @@ class AnalyticsService:
         }
         
         return UserAnalyticsResponse(
-            user_id=0,  # System-wide analytics
+            user_id="system_analytics",  # System-wide analytics
             user_profile={
                 "total_sessions": unique_users * 3,  # Estimate sessions per user
                 "total_requests": total_events,
@@ -375,11 +375,9 @@ class AnalyticsService:
             # Convert event_data to dict for Prisma
             event_dict = {
                 "event_type": event_data.event_type,
-                "event_name": event_data.event_name,
-                "event_data": event_data.event_data,
+                "event_data": json.dumps(event_data.event_data) if event_data.event_data else None,
                 "user_id": str(event_data.user_id),
                 "session_id": event_data.session_id,
-                "created_at": datetime.utcnow(),
                 "ip_address": event_data.ip_address,
                 "user_agent": event_data.user_agent
             }
@@ -462,7 +460,7 @@ class AnalyticsService:
         # Would analyze cultural context of events
         return 0.8
 
-    def _get_recommendations_performance(self, user_id: int) -> dict:
+    def _get_recommendations_performance(self, user_id: str) -> dict:
         """Get recommendations performance for user"""
         logs = self.db.query(RecommendationLog).filter(
             RecommendationLog.user_id == user_id
@@ -501,7 +499,7 @@ class AnalyticsService:
     async def get_demo_analytics(self) -> UserAnalyticsResponse:
         """Returns demo analytics data for unauthenticated users"""
         return UserAnalyticsResponse(
-            user_id=0, # Placeholder for a demo user ID
+            user_id="demo_user", # Placeholder for a demo user ID
             user_profile={
                 "total_sessions": 15,
                 "total_requests": 125,
@@ -622,13 +620,13 @@ def track_event(
     
     # Set user_id if not provided
     if not event_data.user_id and current_user:
-        event_data.user_id = current_user.id
+        event_data.user_id = str(current_user.id)  # Convert to string
     elif not event_data.user_id and not current_user:
         # If no user is available, try to get the first user from database
         try:
             first_user = db.user.find_first()
             if first_user:
-                event_data.user_id = first_user.id
+                event_data.user_id = str(first_user.id)  # Convert to string
                 print(f"Using fallback user: {first_user.email} (ID: {first_user.id})")
             else:
                 return {"status": "error", "reason": "No users found in database"}
@@ -670,32 +668,32 @@ async def create_test_events(
     test_events = [
         {
             "event_type": "food_analysis",
-            "event_data": {"food_name": "pizza", "cuisine": "italian"},
-            "user_id": user.id,
+            "event_data": json.dumps({"food_name": "pizza", "cuisine": "italian"}),
+            "user_id": str(user.id),  # Convert to string
             "session_id": "session_1"
         },
         {
             "event_type": "story_generation",
-            "event_data": {"genre": "adventure", "prompt": "cultural journey"},
-            "user_id": user.id,
+            "event_data": json.dumps({"genre": "adventure", "prompt": "cultural journey"}),
+            "user_id": str(user.id),  # Convert to string
             "session_id": "session_1"
         },
         {
             "event_type": "travel_planning",
-            "event_data": {"destination": "tokyo", "style": "cultural"},
-            "user_id": user.id,
+            "event_data": json.dumps({"destination": "tokyo", "style": "cultural"}),
+            "user_id": str(user.id),  # Convert to string
             "session_id": "session_2"
         },
         {
             "event_type": "recommendations",
-            "event_data": {"category": "movies", "preferences": "international"},
-            "user_id": user.id,
+            "event_data": json.dumps({"category": "movies", "preferences": "international"}),
+            "user_id": str(user.id),  # Convert to string
             "session_id": "session_2"
         },
         {
             "event_type": "food_analysis",
-            "event_data": {"food_name": "sushi", "cuisine": "japanese"},
-            "user_id": user.id,
+            "event_data": json.dumps({"food_name": "sushi", "cuisine": "japanese"}),
+            "user_id": str(user.id),  # Convert to string
             "session_id": "session_3"
         }
     ]

@@ -1,0 +1,62 @@
+services:
+  - type: web
+    name: culturo-backend
+    env: python
+    plan: starter
+    buildCommand: |
+      pip install -r requirements.txt
+      prisma generate
+    startCommand: |
+      prisma db push
+      uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: QLOO_API_KEY
+        sync: false
+      - key: QLOO_API_URL
+        value: https://api.qloo.com/v1
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 30
+      - key: CLERK_SECRET_KEY
+        sync: false
+      - key: CLERK_PUBLISHABLE_KEY
+        sync: false
+      - key: CLERK_JWT_ISSUER
+        sync: false
+      - key: CLERK_WEBHOOK_SECRET
+        sync: false
+      - key: GOOGLE_PLACES_API_KEY
+        sync: false
+      - key: OPENWEATHER_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        value: '["https://your-app-name.vercel.app"]'
+      - key: PROMETHEUS_ENABLED
+        value: true
+      - key: FOOD_MODEL_PATH
+        value: ./app/ml/models/food101
+      - key: CACHE_TTL
+        value: 3600
+      - key: RATE_LIMIT_PER_MINUTE
+        value: 60
+      - key: MAX_FILE_SIZE
+        value: 10485760
+      - key: ALLOWED_IMAGE_TYPES
+        value: '["image/jpeg", "image/png", "image/webp"]'
+      - key: DEBUG
+        value: false
+      - key: ENVIRONMENT
+        value: production 

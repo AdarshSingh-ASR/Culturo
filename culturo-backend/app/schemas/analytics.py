@@ -13,9 +13,8 @@ class EventTypeEnum(str, Enum):
 
 class AnalyticsEvent(BaseModel):
     event_type: EventTypeEnum
-    event_name: str
     event_data: Optional[Dict[str, Any]] = None
-    user_id: Optional[int] = None
+    user_id: Optional[str] = None  # Changed to string to match Prisma schema
     session_id: Optional[str] = None
     timestamp: datetime
     ip_address: Optional[str] = None
@@ -25,9 +24,8 @@ class AnalyticsEvent(BaseModel):
 
 class AnalyticsEventCreate(BaseModel):
     event_type: EventTypeEnum
-    event_name: str
     event_data: Optional[Dict[str, Any]] = None
-    user_id: Optional[int] = None
+    user_id: Optional[str] = None  # Changed to string to match Prisma schema
     session_id: Optional[str] = None
     ip_address: Optional[str] = None
     user_agent: Optional[str] = None
@@ -61,7 +59,7 @@ class CulturalInsight(BaseModel):
     diversity_index: float
 
 class UserAnalyticsResponse(BaseModel):
-    user_id: int
+    user_id: str  # Changed to string to match Prisma schema
     user_profile: UserProfile
     feature_usage: List[FeatureUsage]
     cultural_insights: CulturalInsight
@@ -124,7 +122,7 @@ class CulturalTrendsResponse(BaseModel):
     response_date: datetime
 
 class UserBehavior(BaseModel):
-    user_id: int
+    user_id: str  # Changed to string to match Prisma schema
     session_patterns: List[Dict[str, Any]]
     feature_adoption: Dict[str, Any]
     cultural_exploration: Dict[str, Any]
@@ -132,7 +130,7 @@ class UserBehavior(BaseModel):
     conversion_funnel: Dict[str, Any]
 
 class UserBehaviorResponse(BaseModel):
-    user_id: int
+    user_id: str  # Changed to string to match Prisma schema
     behavior: UserBehavior
     insights: List[str]
     recommendations: List[str]

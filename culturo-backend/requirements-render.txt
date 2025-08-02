@@ -1,0 +1,51 @@
+# Render-optimized requirements for Culturo Backend
+# This file excludes heavy ML libraries that might cause build issues
+
+# Core FastAPI and Web Framework
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+python-dotenv>=1.0.1
+python-multipart>=0.0.9
+pydantic>=2.9.0
+pydantic-settings>=2.0.0
+
+# HTTP and API Clients
+httpx>=0.27.0
+requests>=2.31.0
+aiohttp>=3.9.0
+
+# AI and LLM Integration (lightweight versions)
+google-generativeai>=0.8.0
+openai>=1.0.0
+langchain>=0.1.0
+langchain-community>=0.0.20
+sentence-transformers>=2.2.0
+
+# Database and ORM
+prisma>=0.13.0
+redis>=5.0.0
+
+# Authentication and Security
+python-jose>=3.3.0
+python-dateutil>=2.8.0
+email-validator>=2.0.0
+passlib>=1.7.0
+bcrypt>=4.0.0
+
+# Data Processing (lightweight)
+numpy>=1.24.0,<2.0.0
+pandas>=2.0.0
+
+# Text Processing and NLP (essential only)
+nltk>=3.8.0
+python-docx>=1.1.0
+
+# Monitoring and Metrics
+prometheus-fastapi-instrumentator>=6.1.0
+
+# Production and Deployment
+gunicorn>=21.2.0
+
+# Additional Utilities
+python-multipart>=0.0.9
+aiofiles>=23.0.0 

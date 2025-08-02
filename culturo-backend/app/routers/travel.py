@@ -30,7 +30,7 @@ class TravelService:
         self.llm_service = LLMService()
         self.qloo_service = QlooService()
 
-    async def plan_travel(self, request: TravelPlanningRequest, user_id: Optional[int] = None) -> TravelPlanningResponse:
+    async def plan_travel(self, request: TravelPlanningRequest, user_id: Optional[str] = None) -> TravelPlanningResponse:
         """Plan culturally-aware travel itinerary"""
         try:
             # Get cultural insights for destination
@@ -1033,7 +1033,7 @@ async def plan_travel(
             db.analytics.create(
                 data={
                     "event_type": "travel",
-                    "event_data": {"destination": request.destination, "travel_style": request.travel_style},
+                    "event_data": json.dumps({"destination": request.destination, "travel_style": request.travel_style}),
                     "user_id": str(current_user.id),  # Convert to string for Prisma
                     "session_id": f"session_{current_user.id}_{datetime.utcnow().strftime('%Y%m%d')}"
                 }
@@ -1042,7 +1042,7 @@ async def plan_travel(
             logger.error(f"Failed to track analytics: {analytics_error}")
             # Continue without analytics tracking
     
-    return await travel_service.plan_travel(request, current_user.id if current_user else None)
+    return await travel_service.plan_travel(request, str(current_user.id) if current_user else None)
 
 @router.post("/destinations", response_model=DestinationRecommendationResponse)
 async def get_destination_recommendations(
@@ -1082,7 +1082,7 @@ def get_user_trips(
 ):
     """Get user's trips"""
     trips = db.trip.find_many(
-        where={"user_id": current_user.id},
+        where={"user_id": str(current_user.id)},  # Convert to string
         order={"created_at": "desc"},
         take=limit
     )
