@@ -120,34 +120,60 @@ HOST=0.0.0.0
 ```json
 {
   "build": {
-    "builder": "NIXPACKS"
+    "builder": "DOCKERFILE"
   },
   "deploy": {
-    "startCommand": "python main.py",
-    "healthcheckPath": "/health",
+    "healthcheckPath": "/api/health",
     "healthcheckTimeout": 300
   }
 }
 ```
 
-### `nixpacks.toml`
-```toml
-[phases.setup]
-nixPkgs = ["nodejs", "npm", "python3", "python3Packages.pip"]
+### `Dockerfile`
+```dockerfile
+# Use Python 3.11 slim image as base
+FROM python:3.11-slim
 
-[phases.install]
-cmds = [
-  "cd culturo-frontend && npm install",
-  "cd ../culturo-backend && pip install -r requirements.txt"
-]
+# Set working directory
+WORKDIR /app
 
-[phases.build]
-cmds = [
-  "cd culturo-frontend && npm run build"
-]
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
-[start]
-cmd = "python main.py"
+# Install Node.js and npm
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs
+
+# Copy package files first for better caching
+COPY culturo-frontend/package*.json ./culturo-frontend/
+COPY culturo-backend/requirements.txt ./culturo-backend/
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r culturo-backend/requirements.txt
+
+# Install Node.js dependencies
+RUN cd culturo-frontend && npm install
+
+# Copy the rest of the application
+COPY . .
+
+# Build the frontend
+RUN cd culturo-frontend && npm run build
+
+# Expose port
+EXPOSE 8000
+
+# Set environment variables
+ENV PYTHONPATH=/app/culturo-backend
+ENV HOST=0.0.0.0
+ENV PORT=8000
+ENV ENVIRONMENT=production
+
+# Start the application
+CMD ["python", "main.py"]
 ```
 
 ## 🌐 How the Unified Server Works
@@ -184,6 +210,21 @@ Check logs in Railway dashboard for:
 
 ## 🚨 Troubleshooting
 
+### Migration from Nixpacks to Dockerfile
+
+If you encounter Nixpacks build failures (like the "undefined variable 'npm'" error), the project now includes a Dockerfile as an alternative deployment method:
+
+1. **Automatic Switch**: Railway will automatically use the Dockerfile if Nixpacks fails
+2. **Manual Switch**: You can force Dockerfile usage by updating `railway.json`:
+   ```json
+   {
+     "build": {
+       "builder": "DOCKERFILE"
+     }
+   }
+   ```
+3. **Benefits**: Dockerfile deployment is more reliable and predictable
+
 ### Common Issues
 
 #### 1. Build Failures
@@ -192,6 +233,8 @@ Check logs in Railway dashboard for:
 - Check logs in Railway dashboard
 - Ensure all dependencies are in `requirements.txt` and `package.json`
 - Verify Node.js and Python versions
+- **Nixpacks Issues**: If you encounter Nixpacks errors, switch to Dockerfile deployment
+- **Docker Build Issues**: Check if all required files are present and not excluded by `.dockerignore`
 
 #### 2. Environment Variables
 **Problem**: App can't find API keys or database
