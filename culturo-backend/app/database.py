@@ -17,14 +17,40 @@ prisma = Prisma()
 # Redis client - make it optional
 redis_client: Optional[redis.Redis] = None
 
+def debug_redis_config():
+    """Debug Redis configuration"""
+    env_redis_url = os.getenv("REDIS_URL")
+    settings_redis_url = settings.redis_url
+    
+    logger.info("=== Redis Configuration Debug ===")
+    logger.info(f"Environment REDIS_URL: {'Set' if env_redis_url else 'Not set'}")
+    if env_redis_url:
+        logger.info(f"Environment REDIS_URL (first 20 chars): {env_redis_url[:20]}...")
+    logger.info(f"Settings REDIS_URL: {settings_redis_url}")
+    logger.info(f"Redis client initialized: {redis_client is not None}")
+    logger.info("=================================")
+
+
+# Try to connect to Redis with explicit environment variable check
 try:
-    redis_client = redis.from_url(settings.redis_url, decode_responses=True)
-    # Test connection
-    redis_client.ping()
-    logger.info("Redis connection established successfully")
+    redis_url = os.getenv("REDIS_URL")
+    if redis_url:
+        logger.info(f"Found REDIS_URL in environment: {redis_url[:20]}...")  # Log first 20 chars for security
+        redis_client = redis.from_url(redis_url, decode_responses=True)
+        # Test connection
+        redis_client.ping()
+        logger.info("Redis connection established successfully")
+    else:
+        logger.warning("REDIS_URL environment variable not found, using settings fallback")
+        redis_client = redis.from_url(settings.redis_url, decode_responses=True)
+        redis_client.ping()
+        logger.info("Redis connection established using settings fallback")
 except Exception as e:
     logger.warning(f"Redis connection failed: {e}. Redis features will be disabled.")
     redis_client = None
+
+# Debug Redis configuration
+debug_redis_config()
 
 
 def ensure_prisma_query_engine():
