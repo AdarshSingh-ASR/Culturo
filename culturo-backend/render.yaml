@@ -6,9 +6,7 @@ services:
     buildCommand: |
       pip install -r requirements-render.txt
       prisma generate
-    startCommand: |
-      prisma db push
-      uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    startCommand: bash start.sh
     envVars:
       - key: PYTHON_VERSION
         value: 3.11
@@ -43,7 +41,7 @@ services:
       - key: OPENWEATHER_API_KEY
         sync: false
       - key: CORS_ORIGINS
-        value: '["https://your-app-name.vercel.app"]'
+        value: '["https://culturo-gold.vercel.app"]'
       - key: PROMETHEUS_ENABLED
         value: true
       - key: FOOD_MODEL_PATH
