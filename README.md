@@ -3,7 +3,7 @@
 A comprehensive cultural intelligence platform that combines AI-powered analysis, personalized recommendations, story development, food intelligence, and travel planning. Culturo leverages the Qloo Taste API and advanced machine learning to provide deep cultural insights and personalized experiences.
 
 ## 🎬 Demo
-[![Watch the demo](images/homepageimage1.png)](https://youtu.be/ZQIFn6ogu5M)
+[![Watch the demo](image/homepageimage1.png)](https://youtu.be/ZQIFn6ogu5M)
 
 Culturo Dashboard - Cultural intelligence and personalized recommendations
 
