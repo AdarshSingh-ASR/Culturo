@@ -22,8 +22,12 @@ COPY culturo-backend/ ./culturo-backend/
 # Copy simple server
 COPY simple_server.py ./
 
-# Test that imports work correctly
-RUN cd culturo-backend && python -c "from app.main import app; print('✅ Backend import successful')"
+# Test that imports work correctly with dummy environment variables
+RUN cd culturo-backend && \
+    DATABASE_URL="postgresql://dummy:dummy@localhost/dummy" \
+    CLERK_SECRET_KEY="dummy_secret_key" \
+    CLERK_JWT_ISSUER="https://dummy.clerk.accounts.dev" \
+    python -c "from app.main import app; print('✅ Backend import successful')"
 
 # Create non-root user
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
