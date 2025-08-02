@@ -5,12 +5,6 @@ set -e
 
 echo "Starting Culturo Backend..."
 
-# Install dependencies if needed
-if [ ! -d "venv" ]; then
-    echo "Installing Python dependencies..."
-    pip install -r requirements-render.txt
-fi
-
 # Generate Prisma client
 echo "Generating Prisma client..."
 prisma generate

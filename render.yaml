@@ -7,6 +7,7 @@ services:
     buildCommand: |
       pip install -r requirements-render.txt
       prisma generate
+      prisma db push
     startCommand: bash start.sh
     envVars:
       - key: PYTHON_VERSION
