@@ -33,8 +33,8 @@
    - **Name**: `culturo-backend`
    - **Root Directory**: `culturo-backend`
    - **Environment**: `Python 3`
-   - **Build Command**: `pip install -r requirements-render.txt && prisma generate`
-   - **Start Command**: `prisma db push && uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+   - **Build Command**: `pip install -r requirements-render.txt && python -m prisma generate`
+- **Start Command**: `python -m prisma db push && uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 
 ## Step 3: Configure Environment Variables
 
@@ -65,7 +65,7 @@ In your Render service dashboard, add the following environment variables:
 
 After deployment, the database will be automatically migrated using:
 ```bash
-prisma db push
+python -m prisma db push
 ```
 
 ## Step 5: Update Frontend Configuration

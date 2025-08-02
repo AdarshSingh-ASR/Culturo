@@ -58,7 +58,7 @@ def ensure_prisma_query_engine():
     try:
         # Try to fetch the query engine if it's not found
         result = subprocess.run(
-            ["prisma", "py", "fetch"], 
+            ["python", "-m", "prisma", "py", "fetch"], 
             capture_output=True, 
             text=True, 
             timeout=30

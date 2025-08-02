@@ -13,7 +13,7 @@ pip install -r requirements.txt
 
 # Generate Prisma client
 echo "🔧 Generating Prisma client..."
-prisma generate
+python -m prisma generate
 
 # Fetch Prisma query engine with retry logic
 echo "📥 Fetching Prisma query engine..."
@@ -21,7 +21,7 @@ max_retries=3
 retry_count=0
 
 while [ $retry_count -lt $max_retries ]; do
-    if prisma py fetch; then
+    if python -m prisma py fetch; then
         echo "✅ Prisma query engine fetched successfully"
         break
     else
@@ -39,6 +39,6 @@ done
 
 # Push database schema
 echo "🗄️ Pushing database schema..."
-prisma db push
+python -m prisma db push
 
 echo "✅ Build completed successfully!" 

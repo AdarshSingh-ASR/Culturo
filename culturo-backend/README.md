@@ -153,8 +153,8 @@ culturo-backend/
    python setup_prisma.py
    
    # Or manually:
-   # prisma generate
-   # prisma db push
+   # python -m prisma generate
+# python -m prisma db push
    ```
 
 6. **Start the server**

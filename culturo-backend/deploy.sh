@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Deployment script for Culturo Backend
+# Deploy script for Culturo Backend
 # This script handles Prisma setup and application startup
 
 set -e
@@ -13,16 +13,14 @@ pip install -r requirements.txt
 
 # Generate Prisma client
 echo "🔧 Generating Prisma client..."
-prisma generate
+python -m prisma generate
 
 # Fetch Prisma query engine for the current platform
 echo "📥 Fetching Prisma query engine..."
-prisma py fetch
+python -m prisma py fetch
 
 # Push database schema
 echo "🗄️ Pushing database schema..."
-prisma db push
+python -m prisma db push
 
-# Start the application
-echo "🌟 Starting FastAPI application..."
-exec uvicorn app.main:app --host 0.0.0.0 --port $PORT 
+echo "✅ Deployment completed successfully!" 
