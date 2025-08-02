@@ -4,12 +4,10 @@ services:
     env: python
     plan: starter
     rootDir: culturo-backend
-    buildCommand: |
-      pip install -r requirements.txt
-      prisma generate
+    buildCommand: bash build.sh
+    startCommand: |
       prisma py fetch
-      prisma db push
-    startCommand: bash deploy.sh
+      uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION

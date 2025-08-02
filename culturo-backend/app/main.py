@@ -78,11 +78,19 @@ app.add_middleware(
 )
 
 # Add trusted host middleware for production
-if settings.environment == "production":
-    app.add_middleware(
-        TrustedHostMiddleware,
-        allowed_hosts=["culturo.com", "api.culturo.com", "localhost"]
-    )
+# Temporarily disabled to fix host header issues
+# if settings.environment == "production":
+#     app.add_middleware(
+#         TrustedHostMiddleware,
+#         allowed_hosts=[
+#             "culturo.com", 
+#             "api.culturo.com", 
+#             "culturo.onrender.com",
+#             "localhost",
+#             "127.0.0.1",
+#             "0.0.0.0"
+#         ]
+#     )
 
 # Add Prometheus metrics if enabled
 if settings.prometheus_enabled:
