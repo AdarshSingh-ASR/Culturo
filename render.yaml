@@ -5,10 +5,10 @@ services:
     plan: starter
     rootDir: culturo-backend
     buildCommand: |
-      pip install -r requirements-render.txt
+      pip install -r requirements.txt
       prisma generate
       prisma db push
-    startCommand: bash start.sh
+    startCommand: gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app --bind 0.0.0.0:$PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.11
