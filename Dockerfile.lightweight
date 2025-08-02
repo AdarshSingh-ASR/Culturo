@@ -1,49 +1,31 @@
-# Multi-stage build to reduce image size
-FROM node:18-alpine AS frontend-builder
-
-# Set working directory
-WORKDIR /app
-
-# Copy frontend package files
-COPY culturo-frontend/package*.json ./
-
-# Install dependencies
-RUN npm ci --only=production=false
-
-# Copy frontend source
-COPY culturo-frontend/ ./
-
-# Build the frontend
-RUN npm run build
-
-# Python runtime stage
+# Ultra-lightweight backend-only Dockerfile
 FROM python:3.11-alpine
 
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install minimal system dependencies
 RUN apk add --no-cache \
     curl \
-    build-base \
     && rm -rf /var/lib/apk/lists/*
 
 # Copy Python requirements
 COPY culturo-backend/requirements.txt ./
 
-# Install Python dependencies
+# Install Python dependencies (only production ones)
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy backend source
+# Copy backend source only
 COPY culturo-backend/ ./culturo-backend/
-
-# Copy built frontend from previous stage
-COPY --from=frontend-builder /app/dist ./culturo-frontend/dist/
 
 # Copy main application files
 COPY main.py ./
 COPY unified_server.py ./
+
+# Create a simple static frontend placeholder
+RUN mkdir -p culturo-frontend/dist && \
+    echo '<!DOCTYPE html><html><head><title>Culturo</title></head><body><h1>Culturo API Server</h1><p>Frontend will be deployed separately</p><p><a href="/api/docs">API Documentation</a></p></body></html>' > culturo-frontend/dist/index.html
 
 # Create non-root user
 RUN adduser -D appuser && chown -R appuser:appuser /app

@@ -225,6 +225,24 @@ If you encounter Nixpacks build failures (like the "undefined variable 'npm'" er
    ```
 3. **Benefits**: Dockerfile deployment is more reliable and predictable
 
+### Image Size Optimization
+
+If you encounter "Image size exceeded limit" errors (Railway free tier has a 4GB limit), the project includes optimized Dockerfiles:
+
+1. **Multi-stage Dockerfile**: Reduces image size by using Alpine Linux and multi-stage builds
+2. **Lightweight Dockerfile**: Backend-only deployment with minimal dependencies
+3. **Frontend Separation**: Deploy frontend separately on Vercel/Netlify for even smaller backend image
+
+**To use the lightweight backend-only deployment:**
+```json
+{
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile.lightweight"
+  }
+}
+```
+
 ### Common Issues
 
 #### 1. Build Failures
@@ -235,6 +253,15 @@ If you encounter Nixpacks build failures (like the "undefined variable 'npm'" er
 - Verify Node.js and Python versions
 - **Nixpacks Issues**: If you encounter Nixpacks errors, switch to Dockerfile deployment
 - **Docker Build Issues**: Check if all required files are present and not excluded by `.dockerignore`
+
+#### 1.1. Image Size Exceeded
+**Problem**: "Image of size X GB exceeded limit of 4.0 GB"
+**Solution**:
+- Use the lightweight Dockerfile: `Dockerfile.lightweight`
+- Deploy frontend separately on Vercel/Netlify
+- Remove unnecessary files from `.dockerignore`
+- Use Alpine Linux base images
+- Implement multi-stage builds
 
 #### 2. Environment Variables
 **Problem**: App can't find API keys or database
