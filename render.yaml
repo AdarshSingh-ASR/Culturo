@@ -1,10 +1,10 @@
 services:
   - type: web
-    name: culturo-backend
+    name: culturo-api
     env: python
     plan: starter
     rootDir: culturo-backend
-    dockerfilePath: null
+    pythonVersion: 3.11
     buildCommand: |
       pip install -r requirements-render.txt
       prisma generate
